@@ -44,7 +44,7 @@ class Import extends Command
 
         $this->importer->setXmlPath($xml);
 
-        $output->write('We are done.');
+        $output->writeln('<info>We are done.</info>');
 
         return true;
     }
