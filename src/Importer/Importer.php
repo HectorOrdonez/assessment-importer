@@ -40,37 +40,65 @@ class Importer implements ImporterInterface
     {
         $reader = new XMLReader();
 
-        if(!$reader->open($this->xmlPath))
-        {
+        if (!$reader->open($this->xmlPath)) {
             throw new ImporterException();
         }
 
         $categories = [];
-        $people = [];
+        $output = [];
+        file_put_contents("output.csv", "name,email,phone,dob,credit card type,interests space seperated\r\n");
 
-        while($reader->read())
-        {
-            if ($reader->nodeType != XMLReader::ELEMENT) continue;
+        while ($reader->read()) {
+            if ($reader->nodeType != XMLReader::ELEMENT) {
+                continue;
+            }
 
-            switch ($reader->name)
-            {
+            switch ($reader->name) {
                 case 'category':
                     $category = simplexml_load_string($reader->readOuterXml());
-                    $categories[(string) $category['id']] = $category->name;
+                    $categories[(string)$category['id']] = (string)$category->name;
                     break;
                 case 'person';
                     $person = simplexml_load_string($reader->readOuterXml());
 
-                    $name = (string) $person->name;
-                    $mail = (string) $person->emailaddress;
-                    $phone = (string) $person->phone;
-                    $homepage = (string) $person->homepage;
-                    $creditCard = (string) $person->creditcard;
+                    $name = (string)$person->name;
+                    $mail = (string)$person->emailaddress;
+                    $phone = (string)$person->phone;
+                    $creditCardCheck = (bool)$person->creditcard;
+                    $age = (string)$person->age;
+                    $interests = $this->getCategoriesFromInterests($categories, $person->profile->interest);
 
-                    echo "#" . count($people) . " {$name} - {$mail} - $phone - $homepage - $creditCard \n";
-                    $people[] = (string) $person->name;
+                    $data = [$name, $mail, $phone, $age, $creditCardCheck, implode(' ', $interests)];
+
+                    file_put_contents("output.csv", implode(',', $data) . "\r\n", FILE_APPEND);
+
                     break;
             }
         }
+    }
+
+    /**
+     * @param array $categories
+     * @param array $interests
+     * @return false|string
+     */
+    private function getCategoriesFromInterests($categories, $interests)
+    {
+        $interestedCategories = [];
+        foreach ($interests as $interest) {
+            $interestedCategories[] = $this->getCategoryNameById($categories, (string)$interest['category']);
+        }
+
+        return $interestedCategories;
+    }
+
+    /**
+     * @param array $categories
+     * @param int $categoryId
+     * @return string|false
+     */
+    private function getCategoryNameById($categories, $categoryId)
+    {
+        return array_key_exists($categoryId, $categories) ? $categories[$categoryId] : false;
     }
 }
