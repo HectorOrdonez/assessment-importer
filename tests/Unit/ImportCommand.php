@@ -19,23 +19,28 @@ class ImportTest extends TestCase
      */
     public function testRunningImportWithoutXmlThrowsAnException()
     {
-        // Prepare
         $command = new Import();
         $commandTester = new CommandTester($command);
 
-        // Action
         $response = $commandTester->execute([]);
 
-        // Assert
         $this->assertEquals(0, $response);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Not enough arguments (missing: "output")
+     */
+    public function testRunningImportWithoutOutputThrowsAnException()
+    {
+        // @todo
     }
 
     /**
      * @depends testRunningImportWithoutXmlThrowsAnException
      */
-    public function testRunningImportPassesXmlToTheImporter()
+    public function testImportCommandPassesXmlAndOutputToImporter()
     {
-        // Prepare
         /**
          * @var Importer|MockInterface $importer
          */
@@ -44,11 +49,11 @@ class ImportTest extends TestCase
         $command->setImporter($importer);
         $commandTester = new CommandTester($command);
         $xmlPath = 'some_path';
+        $outPath = 'another_path';
 
-        // Assert
         $importer->shouldReceive('setXmlPath')->once()->with($xmlPath);
+        $importer->shouldReceive('setOutputPath')->once()->with($outPath);
 
-        // Action
         $commandTester->execute(['xml' => $xmlPath]);
     }
 }

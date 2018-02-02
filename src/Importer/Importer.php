@@ -10,7 +10,7 @@ use App\Importer\Support\XMLReader;
  * This object will handle
  * @package App\Importer
  */
-class Importer implements ImporterInterface
+class Importer
 {
     const ERROR_XML_PATH = 'Xml not found in [%s]. Are you sure it is located in the xml folder?';
 
@@ -55,11 +55,15 @@ class Importer implements ImporterInterface
 
             switch ($reader->name) {
                 case 'category':
+                    $string = $reader->readOuterXml();
                     $category = simplexml_load_string($reader->readOuterXml());
+
                     $categories[(string)$category['id']] = (string)$category->name;
                     break;
                 case 'person';
                     $person = simplexml_load_string($reader->readOuterXml());
+                    echo var_export((string) $reader->readOuterXml(), true);
+
 
                     $name = (string)$person->name;
                     $mail = (string)$person->emailaddress;
