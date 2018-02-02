@@ -43,6 +43,7 @@ class Import extends Command
         $xml = $input->getArgument('xml');
 
         $this->importer->setXmlPath($xml);
+        $this->importer->loadXml();
 
         $output->writeln('<info>We are done.</info>');
 

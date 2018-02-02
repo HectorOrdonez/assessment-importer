@@ -2,7 +2,7 @@
 namespace App\Importer;
 
 use App\Importer\Exception\ImporterException;
-use Symfony\Component\Finder\Finder;
+use App\Importer\Support\XMLReader;
 
 /**
  * Class Importer
@@ -14,7 +14,7 @@ class Importer implements ImporterInterface
 {
     const ERROR_XML_PATH = 'Xml not found in [%s]. Are you sure it is located in the xml folder?';
 
-    private $xml;
+    private $xmlPath;
 
     /**
      * Tells the importer where to look for the xml file
@@ -31,8 +31,46 @@ class Importer implements ImporterInterface
             throw new ImporterException(sprintf(self::ERROR_XML_PATH, $path));
         }
 
-        $this->xml = file_get_contents($path);
+        $this->xmlPath = $path;
 
         return $this;
+    }
+
+    public function loadXml()
+    {
+        $reader = new XMLReader();
+
+        if(!$reader->open($this->xmlPath))
+        {
+            throw new ImporterException();
+        }
+
+        $categories = [];
+        $people = [];
+
+        while($reader->read())
+        {
+            if ($reader->nodeType != XMLReader::ELEMENT) continue;
+
+            switch ($reader->name)
+            {
+                case 'category':
+                    $category = simplexml_load_string($reader->readOuterXml());
+                    $categories[(string) $category['id']] = $category->name;
+                    break;
+                case 'person';
+                    $person = simplexml_load_string($reader->readOuterXml());
+
+                    $name = (string) $person->name;
+                    $mail = (string) $person->emailaddress;
+                    $phone = (string) $person->phone;
+                    $homepage = (string) $person->homepage;
+                    $creditCard = (string) $person->creditcard;
+
+                    echo "#" . count($people) . " {$name} - {$mail} - $phone - $homepage - $creditCard \n";
+                    $people[] = (string) $person->name;
+                    break;
+            }
+        }
     }
 }
