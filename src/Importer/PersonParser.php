@@ -10,6 +10,7 @@ class PersonParser
         $data = [];
         $data['id'] = (string) $element['id'];
         $data['name'] = (string) $element->name;
+        $data['mail'] = $this->parseMail((string) $element->emailaddress);
 
         return $data;
     }
@@ -19,6 +20,12 @@ class PersonParser
         return isset($element['id']);
     }
 
+    private function parseMail($mail)
+    {
+        $mail = substr($mail, strpos($mail,':') + 1);
+
+        return $this->validateMail($mail) ? $mail : '';
+    }
 
     /**
      * @param $mail
