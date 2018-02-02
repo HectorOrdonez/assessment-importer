@@ -3,17 +3,52 @@ namespace App\Importer;
 
 class PersonParser
 {
-    public function parse(\SimpleXMLElement $element)
+    /**
+     * List of available categories that people can take an interest in
+     * @var array
+     */
+    private $availableCategories;
+
+    public function __construct(array $availableCategories)
     {
-        if(!$this->validateBasics($element)) return false;
+        $this->availableCategories = $availableCategories;
+    }
+
+    public function parse(\SimpleXMLElement $personData)
+    {
+        if(!$this->validateBasics($personData)) return false;
 
         $data = [];
-        $data['id'] = (string) $element['id'];
-        $data['name'] = (string) $element->name;
-        $data['mail'] = $this->parseMail((string) $element->emailaddress);
-        $data['phone'] = $this->parsePhone((string) $element->phone);
+        $data['id'] = (string) $personData['id'];
+        $data['name'] = (string) $personData->name;
+        $data['mail'] = $this->parseMail((string) $personData->emailaddress);
+        $data['phone'] = $this->parsePhone((string) $personData->phone);
+        $data['interests'] = $this->parseInterests($personData);
 
         return $data;
+    }
+
+    private function parseInterests(\SimpleXMLElement $personData)
+    {
+        if(!isset($personData->profile) || !isset($personData->profile->interest))
+        {
+            return '';
+        }
+
+        $interests = [];
+
+        foreach($personData->profile->interest as $interest)
+        {
+            $categoryId = (string) $interest['category'];
+
+            if(array_key_exists($categoryId, $this->availableCategories))
+            {
+                $interests[] = $this->availableCategories[$categoryId];
+            }
+
+        }
+
+        return implode(' ', $interests);
     }
 
     private function validateBasics(\SimpleXMLElement $element)
