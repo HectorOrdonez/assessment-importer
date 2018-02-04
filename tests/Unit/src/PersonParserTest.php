@@ -1,7 +1,9 @@
 <?php
 namespace App\Test;
 
+use App\Importer\CreditCardParser;
 use App\Importer\PersonParser;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class PersonParserTest extends TestCase
@@ -13,7 +15,12 @@ class PersonParserTest extends TestCase
 
     public function setUp()
     {
-        $this->parser = new PersonParser();
+        /**
+         * @var CreditCardParser|MockInterface $creditCardParserMock
+         */
+        $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+
+        $this->parser = new PersonParser($creditCardParserMock);
     }
 
     public function testParseReturnsFalseIfIdCannotBeFind()
@@ -112,13 +119,13 @@ class PersonParserTest extends TestCase
         $availableCategories = [
             'category1' => 'category name here',
         ];
-        $parser = new PersonParser(['category1' => 'category name here']);
-        $parser->setAvailableCategories($availableCategories);
+        $this->parser->setAvailableCategories($availableCategories);
 
-        $response = $parser->parse($this->getSampleWithOneInterest());
+        $response = $this->parser->parse($this->getSampleWithOneInterest());
 
         $this->assertEquals($expected, $response);
     }
+
     public function testParsingThreeInterestsThatExists()
     {
         $expected = [
@@ -134,15 +141,47 @@ class PersonParserTest extends TestCase
             'category2' => 'starcraft2',
             'category3' => 'biking like crazy',
         ];
-        $parser = new PersonParser();
-        $parser->setAvailableCategories($availableCategories);
 
-        $response = $parser->parse($this->getSampleWithThreeInterest());
+        $this->parser->setAvailableCategories($availableCategories);
+
+        $response = $this->parser->parse($this->getSampleWithThreeInterest());
+
+        $this->assertEquals($expected, $response);
+    }
+
+    public function testParserAsksCreditCardParserForCreditCardType()
+    {
+        /**
+         * @var CreditCardParser|MockInterface $creditCardParserMock
+         */
+        $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+
+        $expected = [
+            'id' => 'person0',
+            'name' => 'Sample Name',
+            'mail' => '',
+            'phone' => '',
+            'interests' => '',
+        ];
+
+        $parser = new PersonParser($creditCardParserMock);
+
+        $response = $parser->parse($this->getSampleWithCreditCard());
 
         $this->assertEquals($expected, $response);
     }
 
     private function getBasicSample()
+    {
+        return new \SimpleXMLElement('
+        <person id="person0">
+            <name>Sample Name</name>
+            <homepage>samplewebsite.com</homepage>
+            <creditcard>1231 1231 1231 1231</creditcard>
+        </person>');
+    }
+
+    private function getSampleWithCreditCard()
     {
         return new \SimpleXMLElement('
         <person id="person0">

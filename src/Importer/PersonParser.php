@@ -9,6 +9,16 @@ class PersonParser
      */
     private $availableCategories = [];
 
+    /**
+     * @var CreditCardParser
+     */
+    private $creditCardParser;
+
+    public function __construct(CreditCardParser $creditCardParser)
+    {
+        $this->creditCardParser = $creditCardParser;
+    }
+
     public function setAvailableCategories(array $categories)
     {
         $this->availableCategories = $categories;
@@ -24,8 +34,18 @@ class PersonParser
         $data['mail'] = $this->parseMail((string) $personData->emailaddress);
         $data['phone'] = $this->parsePhone((string) $personData->phone);
         $data['interests'] = $this->parseInterests($personData);
+        $data['credit_card_type'] = $this->parseCreditCard((string) $personData->creditcard);
 
         return $data;
+    }
+
+    /**
+     * @param string $creditCard
+     * @return string
+     */
+    private function parseCreditCard($creditCard)
+    {
+        return $this->creditCardParser->parse($creditCard);
     }
 
     private function parseInterests(\SimpleXMLElement $personData)
