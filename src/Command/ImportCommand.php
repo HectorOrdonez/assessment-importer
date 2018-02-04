@@ -50,7 +50,6 @@ class ImportCommand extends Command
             $this->importer->setOutputName($name);
 
             $this->importer->run();
-
         } catch (ImporterException $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
 

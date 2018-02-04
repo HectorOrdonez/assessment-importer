@@ -26,7 +26,9 @@ class PersonParser
 
     public function parse(\SimpleXMLElement $personData)
     {
-        if(!$this->validateBasics($personData)) return false;
+        if (!$this->validateBasics($personData)) {
+            return false;
+        }
 
         $data = [];
         $data['id'] = (string) $personData['id'];
@@ -45,29 +47,27 @@ class PersonParser
      */
     private function parseCreditCard($creditCard)
     {
-        if(empty($creditCard)) return '';
+        if (empty($creditCard)) {
+            return '';
+        }
 
         return $this->creditCardParser->parse($creditCard);
     }
 
     private function parseInterests(\SimpleXMLElement $personData)
     {
-        if(!isset($personData->profile) || !isset($personData->profile->interest))
-        {
+        if (!isset($personData->profile) || !isset($personData->profile->interest)) {
             return '';
         }
 
         $interests = [];
 
-        foreach($personData->profile->interest as $interest)
-        {
+        foreach ($personData->profile->interest as $interest) {
             $categoryId = (string) $interest['category'];
 
-            if(array_key_exists($categoryId, $this->availableCategories))
-            {
+            if (array_key_exists($categoryId, $this->availableCategories)) {
                 $interests[] = $this->availableCategories[$categoryId];
             }
-
         }
 
         return implode(' ', $interests);
@@ -80,7 +80,7 @@ class PersonParser
 
     private function parseMail($mail)
     {
-        $mail = substr($mail, strpos($mail,':') + 1);
+        $mail = substr($mail, strpos($mail, ':') + 1);
 
         return $this->validateMail($mail) ? $mail : '';
     }

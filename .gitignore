@@ -2,3 +2,4 @@
 .vagrant
 output
 vendor
+.php_cs.cache

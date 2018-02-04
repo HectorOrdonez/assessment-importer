@@ -35,8 +35,7 @@ class CreditCardParserTest extends TestCase
             '4222222222222',
         ];
 
-        foreach($creditCardSamples as $sample)
-        {
+        foreach ($creditCardSamples as $sample) {
             $response = $this->parser->parse($sample);
             $this->assertEquals(CreditCardParser::TYPE_VISA, $response);
         }
@@ -49,8 +48,7 @@ class CreditCardParserTest extends TestCase
             '5105105105105100',
         ];
 
-        foreach($creditCardSamples as $sample)
-        {
+        foreach ($creditCardSamples as $sample) {
             $response = $this->parser->parse($sample);
             $this->assertEquals(CreditCardParser::TYPE_MASTERCARD, $response);
         }
@@ -63,12 +61,9 @@ class CreditCardParserTest extends TestCase
             '6799990100000000019',
         ];
 
-        foreach($creditCardSamples as $sample)
-        {
+        foreach ($creditCardSamples as $sample) {
             $response = $this->parser->parse($sample);
             $this->assertEquals(CreditCardParser::TYPE_MAESTRO, $response);
         }
     }
-
-
 }

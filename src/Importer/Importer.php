@@ -74,13 +74,11 @@ class Importer
     {
         list($fileName, $extension) = explode('.', $name);
 
-        if ($extension != 'csv')
-        {
+        if ($extension != 'csv') {
             throw new ImporterException(self::ERROR_OUTPUT_EXTENSION);
         }
 
-        if (empty($fileName))
-        {
+        if (empty($fileName)) {
             throw new ImporterException(self::ERROR_OUTPUT_NAME);
         }
 
@@ -110,8 +108,10 @@ class Importer
                     list($key, $value) = $this->categoryParser->parse($categoryXml);
                     $categories[$key] = $value;
                     break;
-                case 'person';
-                    if(!$categoriesAreParsed) $this->personParser->setAvailableCategories($categories);
+                case 'person':
+                    if (!$categoriesAreParsed) {
+                        $this->personParser->setAvailableCategories($categories);
+                    }
 
                     $personXml = simplexml_load_string($reader->readOuterXml());
                     $personData = $this->personParser->parse($personXml);

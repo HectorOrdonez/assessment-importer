@@ -21,11 +21,17 @@ class CreditCardParser
     {
         $creditCard = str_replace(' ', '', $creditCard);
 
-        if ($this->isVisa($creditCard)) return self::TYPE_VISA;
+        if ($this->isVisa($creditCard)) {
+            return self::TYPE_VISA;
+        }
 
-        if ($this->isMasterCard($creditCard)) return self::TYPE_MASTERCARD;
+        if ($this->isMasterCard($creditCard)) {
+            return self::TYPE_MASTERCARD;
+        }
 
-        if ($this->isMaestro($creditCard)) return self::TYPE_MAESTRO;
+        if ($this->isMaestro($creditCard)) {
+            return self::TYPE_MAESTRO;
+        }
 
         return self::TYPE_UNKNOWN; //unknown for this system
     }

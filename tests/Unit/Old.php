@@ -8,13 +8,14 @@ class OldTest extends TestCase
 {
     public function testBLe()
     {
-        $path = dirname(dirname(__DIR__) ). '/origin/contactlist.xml';
+        $path = dirname(dirname(__DIR__)). '/origin/contactlist.xml';
         $xmlArray = json_decode(json_encode(simplexml_load_string(file_get_contents($path))), true);
 
         $categories = $xmlArray['categories']['category'];
         $people = $xmlArray['people']['person'];
 
-        function validate($mail) {
+        function validate($mail)
+        {
             $positionApenstaartje = strpos($mail, '@');
             $positionDot = strrpos($mail, '.');
             if ($positionApenstaartje!=false && $positionDot!=false && $positionApenstaartje< $positionDot) {
@@ -22,7 +23,8 @@ class OldTest extends TestCase
             }
         }
 
-        function validate2($phone) {
+        function validate2($phone)
+        {
             if (strlen($phone) > 9) {
                 return true;
             }
@@ -48,7 +50,7 @@ class OldTest extends TestCase
                 }
             }
 
-            $email = substr($people[$i]['emailaddress'], strpos($people[$i]['emailaddress'],':') + 1);
+            $email = substr($people[$i]['emailaddress'], strpos($people[$i]['emailaddress'], ':') + 1);
             if (validate($email) == true) {
                 $csvLine .= $email . ",";
             }
