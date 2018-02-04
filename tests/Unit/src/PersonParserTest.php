@@ -16,16 +16,10 @@ class PersonParserTest extends TestCase
 
     public function setUp()
     {
-        /**
-         * @var CreditCardParser|MockInterface $creditCardParserMock
-         */
-        $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+        $creditCardParserMock = $this->getCreditCardParserMock();
         $creditCardParserMock->shouldReceive('parse')->andReturn('');
 
-        /**
-         * @var InterestsParser|MockInterface $interestsMock
-         */
-        $interestsMock = \Mockery::mock(InterestsParser::class);
+        $interestsMock = $this->getInterestsParserMock();
         $interestsMock->shouldReceive('parse')->andReturn('');
 
         $this->parser = new PersonParser($creditCardParserMock, $interestsMock);
@@ -67,6 +61,21 @@ class PersonParserTest extends TestCase
         $response = $this->parser->parse($this->getSampleWithIncorrectMail());
 
         $this->assertSame($expected, $response);
+    }
+
+
+    public function testAvailableCategoriesReturnsTheParser()
+    {
+        $categories = ['Sample content'];
+
+        $creditCardParserMock = $this->getCreditCardParserMock();
+        $interestsParserMock = $this->getInterestsParserMock();
+        $interestsParserMock->shouldReceive('setAvailableCategories')->once()->with($categories);
+
+        $parser = new PersonParser($creditCardParserMock, $interestsParserMock);
+        $response = $parser->setAvailableCategories($categories);
+
+        $this->assertSame($parser, $response);
     }
 
     public function testCorrectMailGetsParsed()

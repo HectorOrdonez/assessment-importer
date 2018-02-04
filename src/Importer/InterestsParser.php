@@ -83,8 +83,8 @@ class InterestsParser
     private function validate(\SimpleXMLElement $element)
     {
         return
-            isset($this->availableCategories) ||
-            isset($element->profile) ||
+            isset($this->availableCategories) &&
+            isset($element->profile) &&
             isset($element->profile->interest);
     }
 }
