@@ -7,11 +7,11 @@ class PersonParser
      * List of available categories that people can take an interest in
      * @var array
      */
-    private $availableCategories;
+    private $availableCategories = [];
 
-    public function __construct(array $availableCategories)
+    public function setAvailableCategories(array $categories)
     {
-        $this->availableCategories = $availableCategories;
+        $this->availableCategories = $categories;
     }
 
     public function parse(\SimpleXMLElement $personData)

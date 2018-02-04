@@ -13,7 +13,7 @@ class PersonParserTest extends TestCase
 
     public function setUp()
     {
-        $this->parser = new PersonParser([]);
+        $this->parser = new PersonParser();
     }
 
     public function testParseReturnsFalseIfIdCannotBeFind()
@@ -109,7 +109,11 @@ class PersonParserTest extends TestCase
             'interests' => 'category name here',
 
         ];
+        $availableCategories = [
+            'category1' => 'category name here',
+        ];
         $parser = new PersonParser(['category1' => 'category name here']);
+        $parser->setAvailableCategories($availableCategories);
 
         $response = $parser->parse($this->getSampleWithOneInterest());
 
@@ -130,7 +134,8 @@ class PersonParserTest extends TestCase
             'category2' => 'starcraft2',
             'category3' => 'biking like crazy',
         ];
-        $parser = new PersonParser($availableCategories);
+        $parser = new PersonParser();
+        $parser->setAvailableCategories($availableCategories);
 
         $response = $parser->parse($this->getSampleWithThreeInterest());
 
