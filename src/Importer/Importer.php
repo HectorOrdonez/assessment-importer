@@ -24,7 +24,7 @@ class Importer
     public function __construct()
     {
         $this->categoryParser = new CategoryParser();
-        $this->personParser = new PersonParser(new CreditCardParser());
+        $this->personParser = new PersonParser(new CreditCardParser(), new InterestsParser());
     }
 
     /**

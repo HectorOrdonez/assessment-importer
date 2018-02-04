@@ -2,6 +2,7 @@
 namespace App\Test;
 
 use App\Importer\CreditCardParser;
+use App\Importer\InterestsParser;
 use App\Importer\PersonParser;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +20,15 @@ class PersonParserTest extends TestCase
          * @var CreditCardParser|MockInterface $creditCardParserMock
          */
         $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+        $creditCardParserMock->shouldReceive('parse')->andReturn('');
 
-        $this->parser = new PersonParser($creditCardParserMock);
+        /**
+         * @var InterestsParser|MockInterface $interestsMock
+         */
+        $interestsMock = \Mockery::mock(InterestsParser::class);
+        $interestsMock->shouldReceive('parse')->andReturn('');
+
+        $this->parser = new PersonParser($creditCardParserMock, $interestsMock);
     }
 
     public function testParseReturnsFalseIfIdCannotBeFind()
@@ -93,75 +101,10 @@ class PersonParserTest extends TestCase
         $this->assertSame($expected, $response);
     }
 
-    public function testParsingInterestsMissingInCategoriesListYieldsEmptyString()
-    {
-        $expected = [
-            'id' => 'person0',
-            'name' => 'Sample Name',
-            'mail' => '',
-            'phone' => '',
-            'credit_card_type' => '',
-            'interests' => '',
-
-        ];
-        $parser = $this->parser;
-
-        $response = $parser->parse($this->getSampleWithOneInterest());
-
-        $this->assertSame($expected, $response);
-    }
-
-    public function testParsingInterestThatExists()
-    {
-        $expected = [
-            'id' => 'person0',
-            'name' => 'Sample Name',
-            'mail' => '',
-            'phone' => '',
-            'credit_card_type' => '',
-            'interests' => 'category name here',
-
-        ];
-        $availableCategories = [
-            'category1' => 'category name here',
-        ];
-        $this->parser->setAvailableCategories($availableCategories);
-
-        $response = $this->parser->parse($this->getSampleWithOneInterest());
-
-        $this->assertSame($expected, $response);
-    }
-
-    public function testParsingThreeInterestsThatExists()
-    {
-        $expected = [
-            'id' => 'person0',
-            'name' => 'Sample Name',
-            'mail' => '',
-            'phone' => '',
-            'credit_card_type' => '',
-            'interests' => 'boardgames starcraft2 biking like crazy',
-
-        ];
-        $availableCategories = [
-            'category1' => 'boardgames',
-            'category2' => 'starcraft2',
-            'category3' => 'biking like crazy',
-        ];
-
-        $this->parser->setAvailableCategories($availableCategories);
-
-        $response = $this->parser->parse($this->getSampleWithThreeInterest());
-
-        $this->assertSame($expected, $response);
-    }
-
     public function testParserAsksCreditCardParserForCreditCardType()
     {
-        /**
-         * @var CreditCardParser|MockInterface $creditCardParserMock
-         */
-        $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+        $creditCardParserMock = $this->getCreditCardParserMock();
+        $interestsParserMock = $this->getInterestsParserMock();
         $creditCardParserMock->shouldReceive('parse')->once()->with('1231 1231 1231 1231')->andReturn('visa');
 
         $expected = [
@@ -173,7 +116,7 @@ class PersonParserTest extends TestCase
             'interests' => '',
         ];
 
-        $parser = new PersonParser($creditCardParserMock);
+        $parser = new PersonParser($creditCardParserMock, $interestsParserMock);
 
         $response = $parser->parse($this->getSampleWithCreditCard());
 
@@ -198,37 +141,6 @@ class PersonParserTest extends TestCase
             <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
-
-    private function getSampleWithOneInterest()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <homepage>samplewebsite.com</homepage>
-            <profile income="20186.59">
-                <interest category="category1"/>
-                <education>Graduate School</education>
-                <business>No</business>
-            </profile>
-        </person>');
-    }
-
-    private function getSampleWithThreeInterest()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <homepage>samplewebsite.com</homepage>
-            <profile income="20186.59">
-                <interest category="category1"/>
-                <interest category="category2"/>
-                <interest category="category3"/>
-                <education>Graduate School</education>
-                <business>No</business>
-            </profile>
-        </person>');
-    }
-
     private function getSampleWithIncorrectMail()
     {
         return new \SimpleXMLElement('
@@ -267,5 +179,24 @@ class PersonParserTest extends TestCase
             <emailaddress>mailto:samplemail@mail.com</emailaddress>
             <homepage>samplewebsite.com</homepage>
         </person>');
+    }
+
+    /**
+     * @return CreditCardParser|MockInterface $creditCardParserMock
+     */
+    private function getCreditCardParserMock()
+    {
+        return  \Mockery::mock(CreditCardParser::class);
+    }
+
+    /**
+     * @return InterestsParser|MockInterface $interestsParserMock
+     */
+    private function getInterestsParserMock()
+    {
+        $mock = \Mockery::mock(InterestsParser::class);
+        $mock->shouldReceive('parse')->andReturn('');
+
+        return $mock;
     }
 }

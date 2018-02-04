@@ -4,26 +4,44 @@ namespace App\Importer;
 class PersonParser
 {
     /**
-     * List of available categories that people can take an interest in
-     * @var array
-     */
-    private $availableCategories = [];
-
-    /**
      * @var CreditCardParser
      */
     private $creditCardParser;
 
-    public function __construct(CreditCardParser $creditCardParser)
+    /**
+     * @var InterestsParser
+     */
+    private $interestsParser;
+
+    /**
+     * PersonParser constructor.
+     *
+     * @param CreditCardParser $creditCardParser
+     * @param InterestsParser $interestsParser
+     */
+    public function __construct(CreditCardParser $creditCardParser, InterestsParser $interestsParser)
     {
         $this->creditCardParser = $creditCardParser;
+        $this->interestsParser = $interestsParser;
     }
 
+    /**
+     * @param array $categories
+     *
+     * @return $this
+     */
     public function setAvailableCategories(array $categories)
     {
-        $this->availableCategories = $categories;
+        $this->interestsParser->setAvailableCategories($categories);
+
+        return $this;
     }
 
+    /**
+     * @param \SimpleXMLElement $personData
+     *
+     * @return array|bool
+     */
     public function parse(\SimpleXMLElement $personData)
     {
         if (!$this->validateBasics($personData)) {
@@ -36,13 +54,14 @@ class PersonParser
         $data['mail'] = $this->parseMail((string) $personData->emailaddress);
         $data['phone'] = $this->parsePhone((string) $personData->phone);
         $data['credit_card_type'] = $this->parseCreditCard((string) $personData->creditcard);
-        $data['interests'] = $this->parseInterests($personData);
+        $data['interests'] = $this->interestsParser->parse($personData);
 
         return $data;
     }
 
     /**
      * @param string $creditCard
+     *
      * @return string
      */
     private function parseCreditCard($creditCard)
@@ -54,30 +73,20 @@ class PersonParser
         return $this->creditCardParser->parse($creditCard);
     }
 
-    private function parseInterests(\SimpleXMLElement $personData)
-    {
-        if (!isset($personData->profile) || !isset($personData->profile->interest)) {
-            return '';
-        }
-
-        $interests = [];
-
-        foreach ($personData->profile->interest as $interest) {
-            $categoryId = (string) $interest['category'];
-
-            if (array_key_exists($categoryId, $this->availableCategories)) {
-                $interests[] = $this->availableCategories[$categoryId];
-            }
-        }
-
-        return implode(' ', $interests);
-    }
-
+    /**
+     * @param \SimpleXMLElement $element
+     * @return bool
+     */
     private function validateBasics(\SimpleXMLElement $element)
     {
         return isset($element['id']);
     }
 
+    /**
+     * @param $mail
+     *
+     * @return string
+     */
     private function parseMail($mail)
     {
         $mail = substr($mail, strpos($mail, ':') + 1);
@@ -85,6 +94,11 @@ class PersonParser
         return $this->validateMail($mail) ? $mail : '';
     }
 
+    /**
+     * @param $phone
+     *
+     * @return string
+     */
     private function parsePhone($phone)
     {
         return $this->validatePhone($phone) ? $phone : '';
