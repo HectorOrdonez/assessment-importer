@@ -13,6 +13,10 @@ class CreditCardParser
     const TYPE_MASTERCARD = 'mastercard';
     const TYPE_MAESTRO = 'maestro';
 
+    const PREG_VISA = '/^4[0-9]{0,}$/';
+    const PREG_MASTER = '/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[01]|2720)[0-9]{0,}$/';
+    const PREG_MAESTRO = '/^(5[06789]|6)[0-9]{0,}$/';
+
     /**
      * @param $creditCard
      * @return string
@@ -36,18 +40,36 @@ class CreditCardParser
         return self::TYPE_UNKNOWN; //unknown for this system
     }
 
+    /**
+     * Returns whether this credit card is a visa or not
+     *
+     * @param $creditCard
+     * @return int
+     */
     private function isVisa($creditCard)
     {
-        return preg_match('/^4[0-9]{0,}$/', $creditCard);
+        return preg_match(self::PREG_VISA, $creditCard);
     }
 
+    /**
+     * Returns whether this credit card is a master or not
+     *
+     * @param $creditCard
+     * @return int
+     */
     private function isMasterCard($creditCard)
     {
-        return preg_match('/^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[01]|2720)[0-9]{0,}$/', $creditCard);
+        return preg_match(self::PREG_MASTER, $creditCard);
     }
 
+    /**
+     * Returns whether this credit card is a maestro or not
+     *
+     * @param $creditCard
+     * @return int
+     */
     private function isMaestro($creditCard)
     {
-        return preg_match('/^(5[06789]|6)[0-9]{0,}$/', $creditCard);
+        return preg_match(self::PREG_MAESTRO, $creditCard);
     }
 }
