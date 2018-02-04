@@ -45,6 +45,8 @@ class PersonParser
      */
     private function parseCreditCard($creditCard)
     {
+        if(empty($creditCard)) return '';
+
         return $this->creditCardParser->parse($creditCard);
     }
 

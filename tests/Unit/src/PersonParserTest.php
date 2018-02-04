@@ -38,6 +38,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => '',
         ];
         $response = $this->parser->parse($this->getBasicSample());
 
@@ -52,6 +53,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithIncorrectMail());
@@ -67,6 +69,7 @@ class PersonParserTest extends TestCase
             'mail' => 'samplemail@mail.com',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithCorrectMail());
@@ -82,6 +85,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithIncorrectPhone());
@@ -97,6 +101,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => '',
 
         ];
         $parser = $this->parser;
@@ -114,6 +119,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => 'category name here',
+            'credit_card_type' => '',
 
         ];
         $availableCategories = [
@@ -134,6 +140,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => 'boardgames starcraft2 biking like crazy',
+            'credit_card_type' => '',
 
         ];
         $availableCategories = [
@@ -155,6 +162,7 @@ class PersonParserTest extends TestCase
          * @var CreditCardParser|MockInterface $creditCardParserMock
          */
         $creditCardParserMock = \Mockery::mock(CreditCardParser::class);
+        $creditCardParserMock->shouldReceive('parse')->once()->with('1231 1231 1231 1231')->andReturn('visa');
 
         $expected = [
             'id' => 'person0',
@@ -162,6 +170,7 @@ class PersonParserTest extends TestCase
             'mail' => '',
             'phone' => '',
             'interests' => '',
+            'credit_card_type' => 'visa',
         ];
 
         $parser = new PersonParser($creditCardParserMock);
@@ -177,7 +186,6 @@ class PersonParserTest extends TestCase
         <person id="person0">
             <name>Sample Name</name>
             <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
 
@@ -228,7 +236,6 @@ class PersonParserTest extends TestCase
             <name>Sample Name</name>
             <emailaddress>mailto:mail.com</emailaddress>
             <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
 
@@ -239,7 +246,6 @@ class PersonParserTest extends TestCase
             <name>Sample Name</name>
             <phone>312312</phone>
             <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
 
@@ -250,7 +256,6 @@ class PersonParserTest extends TestCase
             <name>Sample Name</name>
             <emailaddress>mailto:samplemail@mail.com</emailaddress>
             <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
 
@@ -261,7 +266,6 @@ class PersonParserTest extends TestCase
             <name>Sample Name</name>
             <emailaddress>mailto:samplemail@mail.com</emailaddress>
             <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
         </person>');
     }
 }
