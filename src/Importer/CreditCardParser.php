@@ -2,6 +2,8 @@
 namespace App\Importer;
 
 /**
+ * This CreditCardParser is quite incomplete: ideally we would add here all the possible credit cards we expect
+ *
  * @source https://stackoverflow.com/questions/72768/how-do-you-detect-credit-card-type-based-on-number
  */
 class CreditCardParser
@@ -17,13 +19,15 @@ class CreditCardParser
      */
     public function parse($creditCard)
     {
+        $creditCard = str_replace(' ', '', $creditCard);
+
         if ($this->isVisa($creditCard)) return self::TYPE_VISA;
 
         if ($this->isMasterCard($creditCard)) return self::TYPE_MASTERCARD;
 
         if ($this->isMaestro($creditCard)) return self::TYPE_MAESTRO;
 
-        return "unknown"; //unknown for this system
+        return self::TYPE_UNKNOWN; //unknown for this system
     }
 
     private function isVisa($creditCard)

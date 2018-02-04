@@ -37,12 +37,12 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => '',
+            'interests' => '',
         ];
         $response = $this->parser->parse($this->getBasicSample());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testIncorrectMailDoesNotGetParsed()
@@ -52,13 +52,13 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => '',
+            'interests' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithIncorrectMail());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testCorrectMailGetsParsed()
@@ -68,13 +68,13 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => 'samplemail@mail.com',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => '',
+            'interests' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithCorrectMail());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testInvalidPhoneDoesNotGetParsed()
@@ -84,13 +84,13 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => '',
+            'interests' => '',
         ];
 
         $response = $this->parser->parse($this->getSampleWithIncorrectPhone());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testParsingInterestsMissingInCategoriesListYieldsEmptyString()
@@ -100,15 +100,15 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => '',
+            'interests' => '',
 
         ];
         $parser = $this->parser;
 
         $response = $parser->parse($this->getSampleWithOneInterest());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testParsingInterestThatExists()
@@ -118,8 +118,8 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => 'category name here',
             'credit_card_type' => '',
+            'interests' => 'category name here',
 
         ];
         $availableCategories = [
@@ -129,7 +129,7 @@ class PersonParserTest extends TestCase
 
         $response = $this->parser->parse($this->getSampleWithOneInterest());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testParsingThreeInterestsThatExists()
@@ -139,8 +139,8 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => 'boardgames starcraft2 biking like crazy',
             'credit_card_type' => '',
+            'interests' => 'boardgames starcraft2 biking like crazy',
 
         ];
         $availableCategories = [
@@ -153,7 +153,7 @@ class PersonParserTest extends TestCase
 
         $response = $this->parser->parse($this->getSampleWithThreeInterest());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     public function testParserAsksCreditCardParserForCreditCardType()
@@ -169,15 +169,15 @@ class PersonParserTest extends TestCase
             'name' => 'Sample Name',
             'mail' => '',
             'phone' => '',
-            'interests' => '',
             'credit_card_type' => 'visa',
+            'interests' => '',
         ];
 
         $parser = new PersonParser($creditCardParserMock);
 
         $response = $parser->parse($this->getSampleWithCreditCard());
 
-        $this->assertEquals($expected, $response);
+        $this->assertSame($expected, $response);
     }
 
     private function getBasicSample()

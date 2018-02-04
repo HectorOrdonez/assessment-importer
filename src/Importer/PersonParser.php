@@ -33,8 +33,8 @@ class PersonParser
         $data['name'] = (string) $personData->name;
         $data['mail'] = $this->parseMail((string) $personData->emailaddress);
         $data['phone'] = $this->parsePhone((string) $personData->phone);
-        $data['interests'] = $this->parseInterests($personData);
         $data['credit_card_type'] = $this->parseCreditCard((string) $personData->creditcard);
+        $data['interests'] = $this->parseInterests($personData);
 
         return $data;
     }

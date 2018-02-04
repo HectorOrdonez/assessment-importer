@@ -1,13 +1,14 @@
 <?php
 namespace App\Command;
 
+use App\Importer\Exception\ImporterException;
 use App\Importer\Importer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Import extends Command
+class ImportCommand extends Command
 {
     /**
      * @var Importer
@@ -30,7 +31,8 @@ class Import extends Command
             ->setName('import')
             ->setDescription('Runs the import')
             ->setHelp('Runs the importer, duh.')
-            ->addArgument('xml', InputArgument::REQUIRED, 'The xml to interpret.');
+            ->addArgument('xml', InputArgument::REQUIRED, 'The xml to interpret.')
+            ->addArgument('output', InputArgument::REQUIRED, 'The name for the generated file');
     }
 
     /**
@@ -41,11 +43,21 @@ class Import extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $xml = $input->getArgument('xml');
+        $name = $input->getArgument('output');
 
-        $this->importer->setXmlPath($xml);
-        $this->importer->loadXml();
+        try {
+            $this->importer->setXmlPath($xml);
+            $this->importer->setOutputName($name);
 
-        $output->writeln('<info>We are done.</info>');
+            $this->importer->run();
+
+        } catch (ImporterException $e) {
+            $output->writeln("<error>{$e->getMessage()}</error>");
+
+            return true;
+        }
+
+        $output->writeln("<info>Done! Check the results in {$name}.</info>");
 
         return true;
     }

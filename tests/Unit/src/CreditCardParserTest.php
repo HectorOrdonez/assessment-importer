@@ -28,8 +28,10 @@ class CreditCardParserTest extends TestCase
     public function testTypeVisa()
     {
         $creditCardSamples = [
-            '4111111111111111',
-            '4012888888881881',
+            '4111 1111 1111 1111',
+            '41111111 11111111',
+            '40 12 88 88 88 88 18 81',
+            '4012 8888 8888 1881',
             '4222222222222',
         ];
 

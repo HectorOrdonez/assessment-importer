@@ -13,8 +13,11 @@ use App\Importer\Support\XMLReader;
 class Importer
 {
     const ERROR_XML_PATH = 'Xml not found in [%s]. Are you sure it is located in the xml folder?';
+    const ERROR_OUTPUT_EXTENSION = 'The output file should be a csv type of file.';
+    const ERROR_OUTPUT_NAME = 'Output name is not valid.';
 
     private $xmlPath;
+    private $outputName;
     private $categoryParser;
     private $personParser;
 
@@ -35,16 +38,56 @@ class Importer
     {
         $path = dirname(dirname(__DIR__)) . "/xml/{$xml}";
 
-        if (!file_exists($path)) {
-            throw new ImporterException(sprintf(self::ERROR_XML_PATH, $path));
-        }
+        $this->validateXmlPath($path);
 
         $this->xmlPath = $path;
 
         return $this;
     }
 
-    public function loadXml()
+    private function validateXmlPath($path)
+    {
+        if (!file_exists($path)) {
+            throw new ImporterException(sprintf(self::ERROR_XML_PATH, $path));
+        }
+
+        return true;
+    }
+
+    /**
+     * Tells the importer the name of the output file
+     *
+     * @param string $name
+     * @return $this
+     * @throws ImporterException
+     */
+    public function setOutputName($name)
+    {
+        $this->validateOutputName($name);
+
+        $this->outputName = $name;
+
+        return $this;
+    }
+
+    private function validateOutputName($name)
+    {
+        list($fileName, $extension) = explode('.', $name);
+
+        if ($extension != 'csv')
+        {
+            throw new ImporterException(self::ERROR_OUTPUT_EXTENSION);
+        }
+
+        if (empty($fileName))
+        {
+            throw new ImporterException(self::ERROR_OUTPUT_NAME);
+        }
+
+        return true;
+    }
+
+    public function run()
     {
         $reader = new XMLReader();
 
@@ -54,7 +97,7 @@ class Importer
 
         $categoriesAreParsed = false;
         $categories = [];
-        file_put_contents("output.csv", "name,email,phone,dob,credit card type,interests space seperated\r\n");
+        $this->writeHeader();
 
         while ($reader->read()) {
             if ($reader->nodeType != XMLReader::ELEMENT) {
@@ -73,10 +116,39 @@ class Importer
                     $personXml = simplexml_load_string($reader->readOuterXml());
                     $personData = $this->personParser->parse($personXml);
 
-                    file_put_contents("output.csv", implode(',', $personData) . "\r\n", FILE_APPEND);
+                    $this->write(implode(',', $personData), FILE_APPEND);
 
                     break;
             }
         }
+    }
+
+    /**
+     * Writes the header of the output file
+     * @return int
+     */
+    private function writeHeader()
+    {
+        $columns = [
+            'name',
+            'email',
+            'phone',
+            'dob',
+            'credit card type',
+            'interests space separated',
+        ];
+
+        return $this->write(implode(',', $columns));
+    }
+
+    /**
+     * Writes the given line in the output file
+     * @param string $line
+     * @param int $flag
+     * @return int
+     */
+    private function write($line, $flag = 0)
+    {
+        return file_put_contents($this->outputName, "{$line}\r\n", $flag);
     }
 }

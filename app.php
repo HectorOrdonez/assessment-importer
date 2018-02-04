@@ -5,6 +5,6 @@ require './vendor/autoload.php';
 
 
 $app = new Application();
-$app->add(new \App\Command\Import());
+$app->add(new \App\Command\ImportCommand());
 $app->run();
 
