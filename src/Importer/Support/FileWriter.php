@@ -12,10 +12,14 @@ class FileWriter
      * FileWriter constructor.
      *
      * @param $fileName
+     *
+     * @return $this
      */
     public function setFileName($fileName)
     {
         $this->fileName = $fileName;
+
+        return $this;
     }
 
     public function writeHeaders()
