@@ -16,10 +16,11 @@ class ImportReader extends \XMLReader
      * @return bool
      * @throws ImporterException
      */
-    public function open ($URI, $encoding = null, $options = 0)
+    public function open($URI, $encoding = null, $options = 0)
     {
-        if(!self::open($URI, $encoding, $options))
-        {
+        try {
+            parent::open($URI, $encoding, $options);
+        } catch (\Exception $e) {
             throw new ImporterException(self::ERROR_CANNOT_OPEN_XML);
         }
     }
@@ -29,9 +30,8 @@ class ImportReader extends \XMLReader
      */
     public function nextElement()
     {
-        while($this->read())
-        {
-            if($this->nodeType != ImportReader::ELEMENT) {
+        while ($this->read()) {
+            if ($this->nodeType != ImportReader::ELEMENT) {
                 continue;
             }
 
