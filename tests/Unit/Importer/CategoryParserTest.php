@@ -30,7 +30,7 @@ class CategoryParserTest extends TestCase
 
         $response = $parser->parse($this->getSample());
 
-        $this->assertEquals(['category1', 'My Category Name'], $response);
+        $this->assertEquals(['category1' => 'My Category Name'], $response);
     }
 
     /**

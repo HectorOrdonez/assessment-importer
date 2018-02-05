@@ -3,6 +3,10 @@ namespace App\Importer\Support;
 
 use App\Importer\Exception\ImporterException;
 
+/**
+ * Class ImportReader
+ * @package App\Importer\Support
+ */
 class ImportReader extends \XMLReader
 {
     const ERROR_CANNOT_OPEN_XML = 'Critical error: could not open specified xml after validation.';
@@ -39,5 +43,14 @@ class ImportReader extends \XMLReader
         }
 
         return false;
+    }
+
+    /**
+     * Gets the current outer xml and parses it to string. Then returns it
+     *
+     */
+    public function outerXmlToString()
+    {
+        return simplexml_load_string($this->readOuterXml());
     }
 }

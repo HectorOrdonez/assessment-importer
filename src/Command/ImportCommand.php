@@ -8,6 +8,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class ImportCommand
+ * @package App\Command
+ */
 class ImportCommand extends Command
 {
     /**
@@ -15,6 +19,9 @@ class ImportCommand extends Command
      */
     private $importer;
 
+    /**
+     * ImportCommand constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -48,7 +55,6 @@ class ImportCommand extends Command
         try {
             $this->importer->setXmlPath($xml);
             $this->importer->setOutputName($name);
-
             $this->importer->run();
         } catch (ImporterException $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");

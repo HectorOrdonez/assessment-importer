@@ -12,7 +12,7 @@ class CategoryParser
     public function parse(\SimpleXMLElement $element)
     {
         return isset($element['id']) && isset($element->name) ?
-            [(string)$element['id'], (string)$element->name] :
+            [(string)$element['id'] => (string)$element->name] :
             false;
     }
 }

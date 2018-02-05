@@ -47,7 +47,7 @@ class Importer
      * @param CategoryParser|null $categoryParser
      * @param PersonParser|null $personParser
      * @param FileWriter|null $fileWriter
-     * @param XmlReader|null $importReader
+     * @param ImportReader|null $importReader
      */
     public function __construct($categoryParser = null, $personParser = null, $fileWriter = null, $importReader = null)
     {
@@ -62,6 +62,7 @@ class Importer
      * Tells the importer where to look for the xml file
      *
      * @param string $xml
+     *
      * @return $this
      * @throws ImporterException
      */
@@ -89,6 +90,7 @@ class Importer
      * Tells the importer the name of the output file
      *
      * @param string $name
+     *
      * @return $this
      * @throws ImporterException
      */
@@ -101,6 +103,12 @@ class Importer
         return $this;
     }
 
+    /**
+     * @param $name
+     *
+     * @return bool
+     * @throws ImporterException
+     */
     private function validateOutputName($name)
     {
         list($fileName, $extension) = explode('.', $name);
@@ -121,31 +129,32 @@ class Importer
      */
     public function run()
     {
+        $categories = [];
+        $categoriesAreSet = false;
+
         $this->importReader->open($this->xmlPath);
 
-        $categoriesAreParsed = false;
-        $categories = [];
         $this->fileWriter->writeHeaders();
 
         while ($this->importReader->nextElement()) {
-            switch ($this->importReader->name) {
-                case 'category':
-                    $categoryXml = simplexml_load_string($this->importReader->readOuterXml());
-                    list($key, $value) = $this->categoryParser->parse($categoryXml);
-                    $categories[$key] = $value;
-                    break;
-                case 'person':
-                    if (!$categoriesAreParsed) {
-                        $this->personParser->setAvailableCategories($categories);
-                    }
-
-                    $personXml = simplexml_load_string($this->importReader->readOuterXml());
-                    $personData = $this->personParser->parse($personXml);
-
-                    $this->fileWriter->writeln(implode(',', $personData), FILE_APPEND);
-
-                    break;
+            if ($this->importReader->name == 'category') {
+                array_merge($categories, $this->categoryParser->parse($this->importReader->outerXmlToString()));
+            } elseif ($this->importReader->name == 'person') {
+                if (!$categoriesAreSet) {
+                    $this->personParser->setAvailableCategories($categories);
+                }
+                $this->parseAndWritePerson();
             }
         }
+    }
+
+    /**
+     * Uses the current person from the reader to parse it and print the results with the file writer
+     */
+    private function parseAndWritePerson()
+    {
+        $personData = $this->personParser->parse($this->importReader->outerXmlToString());
+
+        $this->fileWriter->writeln(implode(',', $personData), FILE_APPEND);
     }
 }

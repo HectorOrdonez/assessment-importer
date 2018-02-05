@@ -1,6 +1,10 @@
 <?php
 namespace App\Importer\Support;
 
+/**
+ * Class FileWriter
+ * @package App\Importer\Support
+ */
 class FileWriter
 {
     /**
@@ -22,6 +26,11 @@ class FileWriter
         return $this;
     }
 
+    /**
+     * Writes the column headers of the csv
+     *
+     * @return int
+     */
     public function writeHeaders()
     {
         $columns = [
