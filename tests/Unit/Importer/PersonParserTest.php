@@ -1,11 +1,11 @@
 <?php
-namespace App\Test;
+namespace App\Test\Unit\Importer;
 
 use App\Importer\CreditCardParser;
 use App\Importer\InterestsParser;
 use App\Importer\PersonParser;
+use App\Test\Unit\TestCase;
 use Mockery\MockInterface;
-use PHPUnit\Framework\TestCase;
 
 class PersonParserTest extends TestCase
 {
@@ -27,7 +27,7 @@ class PersonParserTest extends TestCase
 
     public function testParseReturnsFalseIfIdCannotBeFind()
     {
-        $response = $this->parser->parse($this->getSampleWithoutId());
+        $response = $this->parser->parse($this->getPersonWithoutId());
 
         $this->assertFalse($response);
     }
@@ -42,7 +42,7 @@ class PersonParserTest extends TestCase
             'credit_card_type' => '',
             'interests' => '',
         ];
-        $response = $this->parser->parse($this->getBasicSample());
+        $response = $this->parser->parse($this->getPersonSample());
 
         $this->assertSame($expected, $response);
     }
@@ -58,7 +58,7 @@ class PersonParserTest extends TestCase
             'interests' => '',
         ];
 
-        $response = $this->parser->parse($this->getSampleWithIncorrectMail());
+        $response = $this->parser->parse($this->getPersonWithIncorrectMail());
 
         $this->assertSame($expected, $response);
     }
@@ -89,7 +89,7 @@ class PersonParserTest extends TestCase
             'interests' => '',
         ];
 
-        $response = $this->parser->parse($this->getSampleWithCorrectMail());
+        $response = $this->parser->parse($this->getPersonWithCorrectMail());
 
         $this->assertSame($expected, $response);
     }
@@ -105,7 +105,7 @@ class PersonParserTest extends TestCase
             'interests' => '',
         ];
 
-        $response = $this->parser->parse($this->getSampleWithIncorrectPhone());
+        $response = $this->parser->parse($this->getPersonWithIncorrectPhone());
 
         $this->assertSame($expected, $response);
     }
@@ -127,67 +127,9 @@ class PersonParserTest extends TestCase
 
         $parser = new PersonParser($creditCardParserMock, $interestsParserMock);
 
-        $response = $parser->parse($this->getSampleWithCreditCard());
+        $response = $parser->parse($this->getPersonWithCreditCard());
 
         $this->assertSame($expected, $response);
-    }
-
-    private function getBasicSample()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <homepage>samplewebsite.com</homepage>
-        </person>');
-    }
-
-    private function getSampleWithCreditCard()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <homepage>samplewebsite.com</homepage>
-            <creditcard>1231 1231 1231 1231</creditcard>
-        </person>');
-    }
-    private function getSampleWithIncorrectMail()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <emailaddress>mailto:mail.com</emailaddress>
-            <homepage>samplewebsite.com</homepage>
-        </person>');
-    }
-
-    private function getSampleWithIncorrectPhone()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <phone>312312</phone>
-            <homepage>samplewebsite.com</homepage>
-        </person>');
-    }
-
-    private function getSampleWithCorrectMail()
-    {
-        return new \SimpleXMLElement('
-        <person id="person0">
-            <name>Sample Name</name>
-            <emailaddress>mailto:samplemail@mail.com</emailaddress>
-            <homepage>samplewebsite.com</homepage>
-        </person>');
-    }
-
-    private function getSampleWithoutId()
-    {
-        return new \SimpleXMLElement('
-        <person>
-            <name>Sample Name</name>
-            <emailaddress>mailto:samplemail@mail.com</emailaddress>
-            <homepage>samplewebsite.com</homepage>
-        </person>');
     }
 
     /**

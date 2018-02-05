@@ -2,7 +2,8 @@
 namespace App\Importer;
 
 use App\Importer\Exception\ImporterException;
-use App\Importer\Support\XMLReader;
+use App\Importer\Support\FileWriter;
+use App\Importer\Support\ImportReader;
 
 /**
  * Class Importer
@@ -16,15 +17,45 @@ class Importer
     const ERROR_OUTPUT_EXTENSION = 'The output file should be a csv type of file.';
     const ERROR_OUTPUT_NAME = 'Output name is not valid.';
 
+    /**
+     * @var string
+     */
     private $xmlPath;
-    private $outputName;
+
+    /**
+     * @var CategoryParser
+     */
     private $categoryParser;
+
+    /**
+     * @var PersonParser
+     */
     private $personParser;
 
-    public function __construct()
+    /**
+     * @var FileWriter
+     */
+    private $fileWriter;
+
+    /**
+     * @var  ImportReader
+     */
+    private $importReader;
+
+    /**
+     * Importer constructor.
+     * @param CategoryParser|null $categoryParser
+     * @param PersonParser|null $personParser
+     * @param FileWriter|null $fileWriter
+     * @param XmlReader|null $importReader
+     */
+    public function __construct($categoryParser = null, $personParser = null, $fileWriter = null, $importReader = null)
     {
-        $this->categoryParser = new CategoryParser();
-        $this->personParser = new PersonParser(new CreditCardParser(), new InterestsParser());
+        $this->categoryParser = $categoryParser ? $categoryParser : new CategoryParser();
+        $this->personParser = $personParser ? $personParser :
+            new PersonParser(new CreditCardParser(), new InterestsParser());
+        $this->fileWriter = $fileWriter ? $fileWriter : new FileWriter();
+        $this->importReader = $importReader ? $importReader : new ImportReader();
     }
 
     /**
@@ -65,7 +96,7 @@ class Importer
     {
         $this->validateOutputName($name);
 
-        $this->outputName = $name;
+        $this->fileWriter->setFileName($name);
 
         return $this;
     }
@@ -85,26 +116,21 @@ class Importer
         return true;
     }
 
+    /**
+     * @throws ImporterException
+     */
     public function run()
     {
-        $reader = new XMLReader();
-
-        if (!$reader->open($this->xmlPath)) {
-            throw new ImporterException();
-        }
+        $this->importReader->open($this->xmlPath);
 
         $categoriesAreParsed = false;
         $categories = [];
-        $this->writeHeader();
+        $this->fileWriter->writeHeaders();
 
-        while ($reader->read()) {
-            if ($reader->nodeType != XMLReader::ELEMENT) {
-                continue;
-            }
-
-            switch ($reader->name) {
+        while ($this->importReader->nextElement()) {
+            switch ($this->importReader->name) {
                 case 'category':
-                    $categoryXml = simplexml_load_string($reader->readOuterXml());
+                    $categoryXml = simplexml_load_string($this->importReader->readOuterXml());
                     list($key, $value) = $this->categoryParser->parse($categoryXml);
                     $categories[$key] = $value;
                     break;
@@ -113,42 +139,13 @@ class Importer
                         $this->personParser->setAvailableCategories($categories);
                     }
 
-                    $personXml = simplexml_load_string($reader->readOuterXml());
+                    $personXml = simplexml_load_string($this->importReader->readOuterXml());
                     $personData = $this->personParser->parse($personXml);
 
-                    $this->write(implode(',', $personData), FILE_APPEND);
+                    $this->fileWriter->writeln(implode(',', $personData), FILE_APPEND);
 
                     break;
             }
         }
-    }
-
-    /**
-     * Writes the header of the output file
-     * @return int
-     */
-    private function writeHeader()
-    {
-        $columns = [
-            'name',
-            'email',
-            'phone',
-            'dob',
-            'credit card type',
-            'interests space separated',
-        ];
-
-        return $this->write(implode(',', $columns));
-    }
-
-    /**
-     * Writes the given line in the output file
-     * @param string $line
-     * @param int $flag
-     * @return int
-     */
-    private function write($line, $flag = 0)
-    {
-        return file_put_contents($this->outputName, "{$line}\r\n", $flag);
     }
 }

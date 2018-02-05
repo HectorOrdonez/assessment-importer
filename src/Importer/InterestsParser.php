@@ -30,8 +30,7 @@ class InterestsParser
      */
     public function parse(\SimpleXMLElement $personElement)
     {
-        if(!$this->validate($personElement))
-        {
+        if (!$this->validate($personElement)) {
             return '';
         }
 

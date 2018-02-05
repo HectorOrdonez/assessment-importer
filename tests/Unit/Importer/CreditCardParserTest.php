@@ -1,8 +1,8 @@
 <?php
-namespace App\Test;
+namespace App\Test\Unit\Importer;
 
 use App\Importer\CreditCardParser;
-use PHPUnit\Framework\TestCase;
+use App\Test\Unit\TestCase;
 
 class CreditCardParserTest extends TestCase
 {

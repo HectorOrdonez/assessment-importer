@@ -1,19 +1,16 @@
 <?php
-namespace App\Test;
+namespace App\Test\Unit\Command;
 
 use App\Command\ImportCommand;
 use App\Importer\Exception\ImporterException;
 use App\Importer\Importer;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use App\Test\Unit\TestCase;
 use Mockery\MockInterface;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ImportTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
-
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Not enough arguments (missing: "xml, output")

@@ -1,8 +1,8 @@
 <?php
-namespace App\Test;
+namespace App\Test\Unit\Importer;
 
 use App\Importer\CategoryParser;
-use PHPUnit\Framework\TestCase;
+use App\Test\Unit\TestCase;
 
 class CategoryParserTest extends TestCase
 {

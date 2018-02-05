@@ -1,8 +1,10 @@
 <?php
-namespace App\Test;
+namespace App\Test\Unit\Importer;
 
 use App\Importer\Importer;
-use PHPUnit\Framework\TestCase;
+use App\Importer\Support\FileWriter;
+use App\Importer\Support\ImportReader;
+use App\Test\Unit\TestCase;
 
 class ImporterTest extends TestCase
 {
@@ -48,5 +50,45 @@ class ImporterTest extends TestCase
         $importer = new Importer();
 
         $importer->setOutputName('.csv');
+    }
+
+    public function testOutputReturnsItself()
+    {
+        $importer = new Importer();
+
+        $response = $importer->setOutputName('text.csv');
+
+        $this->assertSame($importer, $response);
+    }
+
+    public function testRunRequestsImportReaderToOpenXmlFileAndWriterToWriteHeaders()
+    {
+        $xmlPath = 'contacts-xs.xml';
+        $importReaderMock =$this->getImportReaderMock();
+        $importReaderMock->shouldReceive('open')->once();
+        $importReaderMock->shouldReceive('nextElement')->once()->andReturn(false);
+
+        $fileWriter = $this->getFileWriterMock();
+        $fileWriter->shouldReceive('writeHeaders');
+
+        $importer = new Importer(null, null, $fileWriter, $importReaderMock);
+        $importer->setXmlPath($xmlPath);
+        $importer->run();
+    }
+
+    /**
+     * @return \Mockery\MockInterface|ImportReader
+     */
+    private function getImportReaderMock()
+    {
+        return \Mockery::mock(ImportReader::class);
+    }
+
+    /**
+     * @return \Mockery\MockInterface|FileWriter
+     */
+    private function getFileWriterMock()
+    {
+        return \Mockery::mock(FileWriter::class);
     }
 }
